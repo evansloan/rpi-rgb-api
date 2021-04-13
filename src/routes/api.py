@@ -33,3 +33,7 @@ async def effect(request):
 
     return response.json(data)
 
+
+@app.post('/clear')
+async def clear(request):
+    rgbc.clear()

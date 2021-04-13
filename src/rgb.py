@@ -40,6 +40,9 @@ class RGBController(pigpio.pi):
     def clear(self):
         for k in self.pins:
             self.pins[k]['value'] = 0
+        
+        self.stop = True
+        self.apply()
 
     def apply(self):
         for _, color in self.pins.items():
