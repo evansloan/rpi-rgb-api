@@ -1,36 +1,28 @@
 # RGB API
 
-A simple asynchronous RESTful API used to control an LED strip connected to a Raspberry Pi
+A simple asynchronous RESTful API used to control a ws2812b LED strip connected to a Raspberry Pi
 
 Written in Python using [Sanic](https://github.com/sanic-org/sanic) async web framework
 
 LEDs are wired in the below configuration
 
-![](https://i.imgur.com/qEZ0Fu7.png)
+![](https://i.imgur.com/s5mho2P.png)
 
 ## Starting the API
 
 Requires Python >= 3.7
 
-1. Install PiGPIO
-
-`wget http://abyz.me.uk/rpi/pigpio/pigpio.zip && unzip pigpio.zip && cd PIGPIO && sudo make install`
-
-2. Clone rpi-rgb-api
+1. Clone rpi-rgb-api
 
 `git clone https://github.com/evansloan/rpi-rgb-api && cd rpi-rgb-api`
 
-3. Install requirements
+2. Install requirements
 
 `pip install -r requirements.txt`
 
-4. Run PiGPIO
+3. Run web server
 
-`sudo pigpiod`
-
-5. Run web server
-
-`python app.py`
+`sudo python app.py`
 
 ## Using the API
 

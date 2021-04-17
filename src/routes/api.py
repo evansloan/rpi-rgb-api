@@ -5,23 +5,27 @@ from sanic import response
 from src import app, rgbc, utils
 
 
-@app.post('/update')
-async def update(request):
-    data = utils.process_request(request.json, {'color': [list, int]})
+@app.post('/color')
+async def color(request):
+    data = utils.process_request(request.json, {'color': [tuple, int]})
     if not data:
         return response.text('Bad request body')
 
-    rgbc.update(data)
+    rgbc.stop = True
+    rgbc.color = data['color']
     rgbc.apply()
 
     return response.json(data)
 
 
-@app.post('/effect')
+@app.route('/effect', methods=['GET', 'POST'])
 async def effect(request):
+    if request.method == 'GET':
+        return response.json([effect_name for effect_name in rgbc.effects])
+
     data = utils.process_request(request.json, {
         'effect': [str], 
-        'color': [list, int],
+        'color': [tuple, int],
         'speed': [float],
         'duration': [int]
     })

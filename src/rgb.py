@@ -1,27 +1,14 @@
-import pigpio
+import neopixel
 
 
-class RGBController(pigpio.pi):
+class RGBController(neopixel.NeoPixel):
     
     effects = {}
     
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        self.pins = {
-            'red': {
-                'pin': 17,
-                'value': 0
-            },
-            'green': {
-                'pin': 24,
-                'value': 0
-            },
-            'blue': {
-                'pin': 22,
-                'value': 0
-            }
-        }
+    def __init__(self, pwm_pin, pixel_count, **kwargs):
+        super().__init__(pwm_pin, pixel_count, **kwargs)
+        
+        self.color = (0, 0, 0)
         self.stop = False
 
     @classmethod
@@ -31,20 +18,11 @@ class RGBController(pigpio.pi):
             return func
         return wrapper
 
-    def update(self, data):
-        self.stop = True
-
-        for i, k in enumerate(self.pins):
-            self.pins[k]['value'] = data['color'][i]
-
     def clear(self):
-        for k in self.pins:
-            self.pins[k]['value'] = 0
-        
         self.stop = True
+        self.color = (0, 0, 0)
         self.apply()
 
     def apply(self):
-        for _, color in self.pins.items():
-            self.set_PWM_dutycycle(color['pin'], color['value'])
-
+        self.fill(self.color)
+        self.show()
