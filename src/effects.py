@@ -1,8 +1,6 @@
 import asyncio
 from datetime import datetime
 
-import pigpio
-
 from src import utils
 from src.rgb import RGBController
 
@@ -111,7 +109,7 @@ async def race(rgbc, data):
         for i in range(rgbc.n):
             rgbc[i] = data['color']
 
-            for j, k  in zip(range(1, length), range(length, 1, -1)):
+            for j, k in zip(range(1, length), range(length, 1, -1)):
                 rgbc[i - j] = tuple([int(c * (k / 100)) for c in data['color']])
             
             rgbc[i - length] = blank
@@ -185,3 +183,36 @@ async def zipper(rgbc, data):
         await asyncio.sleep(data['speed'])
 
     rgbc.apply()
+
+
+@RGBController.effect('middle_out')
+async def middle_out(rgbc, data):
+    target_time = utils.set_duration(data['duration'])
+
+    midpoint = rgbc.n // 2
+    blank = (0, 0, 0)
+    length = midpoint - 1
+
+    rgbc.fill(blank)
+    rgbc[midpoint] = data['color']
+    rgbc.show()
+
+    left = [i for i in range(midpoint + 1, midpoint + length + 1)]
+    right = [i for i in range(midpoint - 1, midpoint - length - 1, - 1)]
+
+    while not rgbc.stop:
+        for i, (l, r) in enumerate(zip(left, right)):
+            rgbc[l] = tuple([int(c * ((length - i) / 500)) for c in data['color']])
+            rgbc[r] = tuple([int(c * ((length - i) / 500)) for c in data['color']])
+            rgbc.show()
+            await asyncio.sleep(data['speed'])
+        
+        rgbc.fill(blank)
+        rgbc[midpoint] = data['color']
+        rgbc.show()
+
+        rgbc.stop = utils.duration_check(target_time)
+        await asyncio.sleep(data['speed'])
+
+    rgbc.apply()
+
