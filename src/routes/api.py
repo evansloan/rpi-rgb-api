@@ -11,6 +11,7 @@ async def update(request):
     if not data:
         return response.text('Bad request body')
 
+    rgbc.stop = True
     rgbc.color = data['color']
     rgbc.apply()
 

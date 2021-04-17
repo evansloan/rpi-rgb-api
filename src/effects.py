@@ -34,7 +34,7 @@ async def flash(rgbc, data):
 async def glow(rgbc, data):
     target_time = utils.set_duration(data['duration'])
 
-    color_diffs = [i / 255 for i in data['color']]
+    color_diffs = [c / 255 for c in data['color']]
     color = data['color'][:]
     direction = 0
 
@@ -46,11 +46,11 @@ async def glow(rgbc, data):
                 direction = 1
 
         if direction:
-            color = [i + diff for (i, diff) in zip(color, color_diffs)]
+            color = [c + diff for (c, diff) in zip(color, color_diffs)]
         else:
-            color = [i - diff for (i, diff) in zip(color, color_diffs)]
+            color = [c - diff for (c, diff) in zip(color, color_diffs)]
 
-        rgbc.fill(tuple([int(i) for i in color]))
+        rgbc.fill(tuple([int(c) for c in color]))
         rgbc.show()
 
         rgbc.stop = utils.duration_check(target_time)
@@ -70,7 +70,7 @@ async def fade_in(rgbc, data):
             if new_val >= og_val and og_val != 0:
                 rgbc.stop = True
 
-        rgbc.fill(tuple([int(i) for i in color]))
+        rgbc.fill(tuple([int(c) for c in color]))
         rgbc.show()
 
         await asyncio.sleep(data['speed'])
@@ -89,9 +89,99 @@ async def fade_out(rgbc, data):
             if new_val <= 0 and og_val != 0:
                 rgbc.stop = True
 
-        rgbc.fill(tuple([int(i) for i in color]))
+        rgbc.fill(tuple([int(c) for c in color]))
         rgbc.show()
 
+        await asyncio.sleep(data['speed'])
+
+    rgbc.apply()
+
+
+@RGBController.effect('race')
+async def race(rgbc, data):
+    target_time = utils.set_duration(data['duration'])
+
+    blank = (0, 0, 0)
+    rgbc.fill(blank)
+    rgbc.show()
+
+    length = 20
+
+    while not rgbc.stop:
+        for i in range(rgbc.n):
+            rgbc[i] = data['color']
+
+            for j, k  in zip(range(1, length), range(length, 1, -1)):
+                rgbc[i - j] = tuple([int(c * (k / 100)) for c in data['color']])
+            
+            rgbc[i - length] = blank
+            rgbc.show()
+
+            rgbc.stop = utils.duration_check(target_time)
+            await asyncio.sleep(data['speed'])
+
+    rgbc.apply()
+
+
+@RGBController.effect('ants')
+async def ants(rgbc, data):
+    target_time = utils.set_duration(data['duration'])
+
+    blank = (0, 0, 0)
+    rgbc.fill(blank)
+    rgbc.show()
+
+
+    active = 0
+    while not rgbc.stop:
+
+        if active:
+            for i in range(0, rgbc.n, 2):
+                rgbc[i] = data['color']
+            for i in range(1, rgbc.n, 2):
+                rgbc[i] = blank
+        else:
+            for i in range(0, rgbc.n, 2):
+                rgbc[i] = blank
+            for i in range(1, rgbc.n, 2):
+                rgbc[i] = data['color']
+
+        rgbc.show()
+
+        active = not active
+        rgbc.stop = utils.duration_check(target_time)
+        await asyncio.sleep(data['speed'])
+
+    rgbc.apply()
+
+
+@RGBController.effect('zipper')
+async def zipper(rgbc, data):
+    target_time = utils.set_duration(data['duration'])
+
+    blank = (0, 0, 0)
+    rgbc.fill(blank)
+    rgbc.show()
+
+    active = 0
+    while not rgbc.stop:
+        if active:
+            for i in range(0, rgbc.n, 2):
+                rgbc[i] = data['color']
+                rgbc.show()
+            for i in range(1, rgbc.n, 2):
+                rgbc[i] = blank
+                rgbc.show()
+        else:
+            for i in range(0, rgbc.n, 2):
+                rgbc[i] = blank
+                rgbc.show()
+            for i in range(1, rgbc.n, 2):
+                rgbc[i] = data['color']
+                rgbc.show()
+
+        active = not active
+        rgbc.stop = utils.duration_check(target_time)
         await asyncio.sleep(data['speed'])
 
     rgbc.apply()
