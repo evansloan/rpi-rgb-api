@@ -5,7 +5,7 @@ from sanic import response
 from src import app, rgbc, utils
 
 
-@app.post('/update')
+@app.post('/color')
 async def update(request):
     data = utils.process_request(request.json, {'color': [tuple, int]})
     if not data:
