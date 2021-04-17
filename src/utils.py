@@ -29,4 +29,4 @@ def duration_check(target_time):
 
 
 def get_color_diff(color):
-    return int(color / 255) if color != 0 else 0
+    return [c / 255 for c in color]

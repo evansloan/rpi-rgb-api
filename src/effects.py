@@ -32,7 +32,7 @@ async def flash(rgbc, data):
 async def glow(rgbc, data):
     target_time = utils.set_duration(data['duration'])
 
-    color_diffs = [c / 255 for c in data['color']]
+    color_diffs = utils.get_color_diff(data['color'])
     color = data['color'][:]
     direction = 0
 
@@ -59,11 +59,11 @@ async def glow(rgbc, data):
 
 @RGBController.effect('fade_in')
 async def fade_in(rgbc, data):
-    color_diffs = [i / 255 for i in data['color']]
+    color_diffs =  utils.get_color_diff(data['color'])
     color = [0, 0, 0]
 
     while not rgbc.stop:
-        color = [i + diff for (i, diff) in zip(color, color_diffs)]
+        color = [c + diff for (c, diff) in zip(color, color_diffs)]
         for new_val, og_val in zip(color, data['color']):
             if new_val >= og_val and og_val != 0:
                 rgbc.stop = True
@@ -78,11 +78,11 @@ async def fade_in(rgbc, data):
 
 @RGBController.effect('fade_out')
 async def fade_out(rgbc, data):
-    color_diffs = [i / 255 for i in data['color']]
+    color_diffs =  utils.get_color_diff(data['color'])
     color = data['color']
 
     while not rgbc.stop:
-        color = [i - diff for (i, diff) in zip(color, color_diffs)]
+        color = [c - diff for (c, diff) in zip(color, color_diffs)]
         for new_val, og_val in zip(color, data['color']):
             if new_val <= 0 and og_val != 0:
                 rgbc.stop = True
@@ -108,9 +108,13 @@ async def race(rgbc, data):
     while not rgbc.stop:
         for i in range(rgbc.n):
             rgbc[i] = data['color']
+            tail = [j for j in range(i, i + length)]
 
-            for j, k in zip(range(1, length), range(length, 1, -1)):
-                rgbc[i - j] = tuple([int(c * (k / 100)) for c in data['color']])
+            for j, pixel in enumerate(tail):
+                try:
+                    rgbc[pixel] = tuple([int(c * (j / 100)) for c in data['color']])
+                except IndexError:
+                    break
             
             rgbc[i - length] = blank
             rgbc.show()
@@ -136,13 +140,11 @@ async def ants(rgbc, data):
         if active:
             for i in range(0, rgbc.n, 2):
                 rgbc[i] = data['color']
-            for i in range(1, rgbc.n, 2):
-                rgbc[i] = blank
+                rgbc[i + 1] = blank
         else:
             for i in range(0, rgbc.n, 2):
                 rgbc[i] = blank
-            for i in range(1, rgbc.n, 2):
-                rgbc[i] = data['color']
+                rgbc[i + 1] = data['color']
 
         rgbc.show()
 
@@ -205,13 +207,14 @@ async def middle_out(rgbc, data):
             rgbc[l] = tuple([int(c * ((length - i) / 500)) for c in data['color']])
             rgbc[r] = tuple([int(c * ((length - i) / 500)) for c in data['color']])
             rgbc.show()
+
+            rgbc.stop = utils.duration_check(target_time)
             await asyncio.sleep(data['speed'])
         
         rgbc.fill(blank)
         rgbc[midpoint] = data['color']
         rgbc.show()
 
-        rgbc.stop = utils.duration_check(target_time)
         await asyncio.sleep(data['speed'])
 
     rgbc.apply()

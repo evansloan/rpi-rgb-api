@@ -6,7 +6,7 @@ from src import app, rgbc, utils
 
 
 @app.post('/color')
-async def update(request):
+async def color(request):
     data = utils.process_request(request.json, {'color': [tuple, int]})
     if not data:
         return response.text('Bad request body')
