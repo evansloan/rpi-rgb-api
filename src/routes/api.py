@@ -18,8 +18,11 @@ async def update(request):
     return response.json(data)
 
 
-@app.post('/effect')
+@app.route('/effect', methods=['GET', 'POST'])
 async def effect(request):
+    if request.method == 'GET':
+        return response.json([effect_name for effect_name in rgbc.effects])
+
     data = utils.process_request(request.json, {
         'effect': [str], 
         'color': [tuple, int],
