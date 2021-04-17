@@ -1,9 +1,8 @@
-aiofiles==0.6.0
-httptools==0.1.1
-multidict==5.1.0
-pigpio==1.78
+Adafruit-Blinka==6.4.2
+adafruit-circuitpython-neopixel==6.0.3
+adafruit-circuitpython-pypixelbuf==2.2.4
+Adafruit-PlatformDetect==3.5.0
+Adafruit-PureIO==1.1.8
+rpi-ws281x==4.2.6
+RPi.GPIO==0.7.0
 sanic==21.3.2
-sanic-routing==0.5.2
-ujson==4.0.2
-uvloop==0.15.2
-websockets==8.1

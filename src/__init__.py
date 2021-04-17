@@ -1,9 +1,11 @@
+import board
+import neopixel
 from sanic import Sanic
 
 from src import rgb
 
 app = Sanic(name='rgb-api')
-rgbc = rgb.RGBController()
+rgbc = rgb.RGBController(board.D18, 150, brightness=0.2, pixel_order=neopixel.GRB)
 
 from src import effects
 from src.routes import api
