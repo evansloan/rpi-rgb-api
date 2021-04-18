@@ -33,7 +33,7 @@ Available endpoints are located in `src/routes/api.py`
 ### To set the LEDs to a static color:
 
 ```
-curl -H "Content-Type: application/json" -d '{"color": [0,255,0]}' http://192.168.10.164:8000/update
+curl -H "Content-Type: application/json" -d '{"color": [0,255,0]}' http://192.168.10.164:8000/color
 ```
 
 Request body params:
