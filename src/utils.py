@@ -23,9 +23,13 @@ def set_duration(duration):
     return None
 
 
-def duration_check(target_time):
+def duration_check(rgbc, target_time):
+    stop = False
     if target_time is not None:
-        return datetime.now().timestamp() > target_time
+        stop = datetime.now().timestamp() > target_time
+
+    if stop:
+        rgbc.stop_effect()
 
 
 def get_color_diff(color):

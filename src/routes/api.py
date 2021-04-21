@@ -11,7 +11,8 @@ async def color(request):
     if not data:
         return response.text('Bad request body')
 
-    rgbc.stop = True
+    rgbc.stop_effect()
+
     rgbc.color = data['color']
     rgbc.apply()
 
@@ -32,8 +33,8 @@ async def effect(request):
     if not data:
         return response.text('Bad request body')
 
-    rgbc.stop = False
-    asyncio.ensure_future(rgbc.effects[data['effect']](rgbc, data))
+    rgbc.stop_effect()
+    rgbc.set_effect(data)
 
     return response.json(data)
 
@@ -41,3 +42,4 @@ async def effect(request):
 @app.post('/clear')
 async def clear(request):
     rgbc.clear()
+    return response.json({'color', [0, 0, 0]})

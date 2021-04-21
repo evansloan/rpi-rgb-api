@@ -13,7 +13,7 @@ async def flash(rgbc, data):
     off = (0, 0, 0)
     is_on = False
     
-    while not rgbc.stop:
+    while True:
         if is_on:
             rgbc.fill(off)
         else:
@@ -22,9 +22,9 @@ async def flash(rgbc, data):
         rgbc.show()
         is_on = not is_on
 
-        rgbc.stop = utils.duration_check(target_time)
+        utils.duration_check(rgbc, target_time)
         await asyncio.sleep(data['speed'])
-    
+
     rgbc.apply()
 
 
@@ -36,7 +36,7 @@ async def glow(rgbc, data):
     color = data['color'][:]
     direction = 0
 
-    while not rgbc.stop:
+    while True:
         for new_val, og_val in zip(color, data['color']):
             if new_val >= og_val and og_val != 0:
                 direction = 0
@@ -51,7 +51,7 @@ async def glow(rgbc, data):
         rgbc.fill(tuple([int(c) for c in color]))
         rgbc.show()
 
-        rgbc.stop = utils.duration_check(target_time)
+        utils.duration_check(rgbc, target_time)
         await asyncio.sleep(data['speed'])
     
     rgbc.apply()
@@ -62,18 +62,18 @@ async def fade_in(rgbc, data):
     color_diffs =  utils.get_color_diff(data['color'])
     color = [0, 0, 0]
 
-    while not rgbc.stop:
+    while True:
         color = [c + diff for (c, diff) in zip(color, color_diffs)]
         for new_val, og_val in zip(color, data['color']):
-            if new_val >= og_val and og_val != 0:
-                rgbc.stop = True
+            if new_val >= og_val and og_val != 0:    
+                rgbc.stop_effect()
+                return
+
 
         rgbc.fill(tuple([int(c) for c in color]))
         rgbc.show()
 
         await asyncio.sleep(data['speed'])
-
-    rgbc.apply()
 
 
 @RGBController.effect('fade_out')
@@ -81,18 +81,17 @@ async def fade_out(rgbc, data):
     color_diffs =  utils.get_color_diff(data['color'])
     color = data['color']
 
-    while not rgbc.stop:
+    while True:
         color = [c - diff for (c, diff) in zip(color, color_diffs)]
         for new_val, og_val in zip(color, data['color']):
             if new_val <= 0 and og_val != 0:
-                rgbc.stop = True
+                rgbc.stop_effect()
+                return
 
         rgbc.fill(tuple([int(c) for c in color]))
         rgbc.show()
 
         await asyncio.sleep(data['speed'])
-
-    rgbc.apply()
 
 
 @RGBController.effect('race')
@@ -105,7 +104,7 @@ async def race(rgbc, data):
 
     length = 20
 
-    while not rgbc.stop:
+    while True:
         for i in range(rgbc.n):
             rgbc[i] = data['color']
             tail = [j for j in range(i, i + length)]
@@ -119,11 +118,10 @@ async def race(rgbc, data):
             rgbc[i - length] = blank
             rgbc.show()
 
-            rgbc.stop = utils.duration_check(target_time)
+            utils.duration_check(rgbc, target_time)
             await asyncio.sleep(data['speed'])
 
     rgbc.apply()
-
 
 @RGBController.effect('ants')
 async def ants(rgbc, data):
@@ -133,10 +131,8 @@ async def ants(rgbc, data):
     rgbc.fill(blank)
     rgbc.show()
 
-
     active = 0
-    while not rgbc.stop:
-
+    while True:
         if active:
             for i in range(0, rgbc.n, 2):
                 rgbc[i] = data['color']
@@ -149,11 +145,10 @@ async def ants(rgbc, data):
         rgbc.show()
 
         active = not active
-        rgbc.stop = utils.duration_check(target_time)
+        utils.duration_check(rgbc, target_time)
         await asyncio.sleep(data['speed'])
 
     rgbc.apply()
-
 
 @RGBController.effect('zipper')
 async def zipper(rgbc, data):
@@ -164,7 +159,7 @@ async def zipper(rgbc, data):
     rgbc.show()
 
     active = 0
-    while not rgbc.stop:
+    while True:
         if active:
             for i in range(0, rgbc.n, 2):
                 rgbc[i] = data['color']
@@ -181,11 +176,10 @@ async def zipper(rgbc, data):
                 rgbc.show()
 
         active = not active
-        rgbc.stop = utils.duration_check(target_time)
+        utils.duration_check(rgbc, target_time)
         await asyncio.sleep(data['speed'])
 
     rgbc.apply()
-
 
 @RGBController.effect('middle_out')
 async def middle_out(rgbc, data):
@@ -202,20 +196,17 @@ async def middle_out(rgbc, data):
     left = [i for i in range(midpoint + 1, midpoint + length + 1)]
     right = [i for i in range(midpoint - 1, midpoint - length - 1, - 1)]
 
-    while not rgbc.stop:
+    while True:
         for i, (l, r) in enumerate(zip(left, right)):
             rgbc[l] = tuple([int(c * ((length - i) / 500)) for c in data['color']])
             rgbc[r] = tuple([int(c * ((length - i) / 500)) for c in data['color']])
             rgbc.show()
 
-            rgbc.stop = utils.duration_check(target_time)
+            utils.duration_check(rgbc, target_time)
             await asyncio.sleep(data['speed'])
         
         rgbc.fill(blank)
         rgbc[midpoint] = data['color']
         rgbc.show()
 
-        await asyncio.sleep(data['speed'])
-
     rgbc.apply()
-
