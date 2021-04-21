@@ -20,5 +20,4 @@ from src.routes import api
 
 @app.listener('before_server_stop')
 async def before_server_stop(app, loop):
-    rgbc.color = (0, 0, 0)
-    rgbc.apply()
+    rgbc.clear()
